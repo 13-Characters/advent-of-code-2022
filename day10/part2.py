@@ -1,4 +1,4 @@
-input = open("example_input.txt").readlines()
+input = open("input.txt").readlines()
 cycleNum = 1
 X = 1
 goodCycles = [20, 60, 100, 140, 180, 220]
