@@ -1,10 +1,24 @@
 import re
+import itertools
 input = open("example_input.txt").readlines()
 class Valve():
     def __init__(self, name, flowRate, adjacents):
         self.name = name
         self.flowRate = flowRate
         self.adjacents = adjacents
+    def getDistance(self, valve): #Helper function to determine the distance to other valve
+        if valve == self:
+            return 0
+        stop = False
+        i = 0
+        while not stop:
+            vDistance = [(self, 0)]
+            for v in vDistance:
+                for adj in v[0].adjacents:
+                    if adj == valve:
+                        return v[1] + 1
+                    if adj not in [x[0] for x in vDistance]:
+                        vDistance.append((adj, v[1] + 1))
 
 # Parse the input
 valves = []
@@ -28,48 +42,21 @@ for v in valves:
     if v.name == 'AA':
         currentValve = v
 stop = False
+openOrder = []
+for v in valves:
+    if v.flowRate > 0:
+        openOrder.append(v)
+openOrder.insert(0, currentValve)
+openOrder.sort(key=lambda x: currentValve.getDistance(x)) # First guess, we will refine this later
+maxPressure = 0
 time = 0
 totalPressure = 0
-opened = []
-while not stop:
-    opened.append(currentValve)
-    valvesByDistance = [currentValve]
-    distances = [0] # Parallel lists may be a bad idea
-    pressures = []
-    i = 0
-    while i < len(valves):
-        for adj in valvesByDistance[i].adjacents:
-            if adj not in valvesByDistance:
-                valvesByDistance.append(adj)
-                distances.append(distances[i] + 1) # Append the distance from currentValve
-        i += 1
-    for j, valve in enumerate(valvesByDistance):
-        if valve not in opened:
-            pressureReleased = valve.flowRate * (30 - time - (distances[j] + 1))
-            pressures.append(pressureReleased)
-        else:
-            pressures.append(0)
-
-    if max(pressures) == 0:
-        for valve in opened:
-            totalPressure += valve.flowRate * (30 - time)
-            time = 29
-            stop = True
-        if stop == True: break
-    for p in range(len(pressures)):
-        if pressures[p] != 0:
-            nearest = distances[p]
-            break
-    indexOfNextValve = 0
-    for p in range(len(pressures)):
-        if distances[p] > nearest:
-            break
-        if pressures[p] > pressures[indexOfNextValve]:
-            indexOfNextValve = p
-    print(f"Minute {time + 1}: Move from {currentValve.name} -> {valvesByDistance[indexOfNextValve].name}, "
-          f"{pressures[indexOfNextValve]} released after opening {valvesByDistance[indexOfNextValve].name}")
-    totalPressure += pressures[indexOfNextValve]
-    time += (distances[indexOfNextValve] + 1)
-    currentValve = valvesByDistance[indexOfNextValve]
-
-print(totalPressure)
+for i in range(1, len(openOrder)):
+    valve = openOrder[i]
+    previousValve = openOrder[i - 1]
+    pressureReleased = valve.flowRate * (30 - time - (previousValve.getDistance(valve) + 1))
+    totalPressure += pressureReleased
+    print(f"Minute {time + 1}: Move from {previousValve.name} -> {valve.name}, "
+            f"{pressureReleased} released after opening {valve.name}")
+    time += previousValve.getDistance(valve) + 1
+print(str(totalPressure))
