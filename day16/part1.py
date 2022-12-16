@@ -1,4 +1,3 @@
-part1.py
 import re
 input = open("example_input.txt").readlines()
 class Valve():
