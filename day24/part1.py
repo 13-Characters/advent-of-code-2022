@@ -1,4 +1,3 @@
-# This solution does not work
 import re
 import numpy as np
 input = open("input.txt").readlines()
@@ -17,9 +16,9 @@ for row in range(height):
         if input[row + 1][column + 1] == "^":
             up[row][column] = 1
         if input[row + 1][column + 1] == "<":
-            down[row][column] = 1
-        if input[row + 1][column + 1] == "v":
             left[row][column] = 1
+        if input[row + 1][column + 1] == "v":
+            down[row][column] = 1
         if input[row + 1][column + 1] == ">":
             right[row][column] = 1
 start = (0, input[0].index("."))
@@ -45,7 +44,7 @@ while True:
         trace = [end]
         prev = current[x][1]
         trace.append(prev)
-        for i in range(minutes - 1, -1, -1):
+        for i in range(minutes - 1, 0, -1):
             prev = pathsList[i][[p[0] for p in pathsList[i]].index(prev)][1]
             trace.append(prev)
         minutes -= 1
@@ -59,6 +58,3 @@ while True:
     left = np.roll(left, -1, axis=1)
 
 print(minutes)
-trace.reverse()
-for c in trace:
-    print(c)
