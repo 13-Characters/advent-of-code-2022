@@ -1,6 +1,6 @@
 import re
 import numpy as np
-input = open("example_input.txt").readlines()
+input = open("input.txt").readlines()
 
 width = len(re.sub("[#\n]", "", input[1]))
 height = []
@@ -39,17 +39,19 @@ while True:
             if isPassable(n[0]):
                 current.append(n)
     minutes += 1
-    if start in [c[0] for c in current] and (stage == 1):
-        pathsList = [[(start, (-1, -1))]]
-        stage = 2
-    if end in [c[0] for c in current] and (stage == 0 or stage == 2):
-        if stage == 2:
-            break
-        else:
-            pathsList = [[end, (end[0] + 1, end[0] + 1)]]
-            stage = 1
     current = [*set(current)]
     pathsList.append(current)
+    if end in [c[0] for c in current] and (stage == 0 or stage == 2):
+        if stage == 2:
+            minutes -= 1
+            break
+        else:
+            pathsList = [[(end, (end[0] + 1, end[0] + 1))]]
+            stage = 1
+    else:
+        if start in [c[0] for c in current] and (stage == 1):
+            pathsList = [[(start, (-1, -1))]]
+            stage = 2
     # Update the blizzard positions
     down = np.roll(down, 1, axis=0)
     up = np.roll(up, -1, axis=0)
